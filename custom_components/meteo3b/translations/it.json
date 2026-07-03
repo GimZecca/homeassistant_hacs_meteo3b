@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Cerca località 3bMeteo",
+        "description": "Digita il nome della località da cercare ({example}).",
+        "data": {
+          "search": "Nome località"
+        }
+      },
+      "select": {
+        "title": "Seleziona la località",
+        "description": "Trovati {count} risultati.",
+        "data": {
+          "location": "Località"
+        }
+      },
+      "manual": {
+        "title": "✏️ Inserisci ID manuale",
+        "description": "Inserisci l'ID località (loc_id) e l'ID settore (sec_id) di 3bMeteo.",
+        "data": {
+          "loc_id": "ID Località",
+          "sec_id": "ID Settore"
+        }
+      }
+    },
+    "error": {
+      "too_short": "Digita almeno 2 caratteri.",
+      "no_results": "Nessun risultato trovato per questa ricerca.",
+      "invalid_selection": "Selezione non valida.",
+      "invalid_id": "ID non valido.",
+      "cannot_connect": "Impossibile verificare questi dati con l'API 3bMeteo."
+    }
+  }
+}

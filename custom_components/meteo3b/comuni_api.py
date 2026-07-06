@@ -1,6 +1,6 @@
 """Ricerca località su 3bMeteo (method=ricerca_elastic_search).
 
-A differenza di ilMeteo, 3bMeteo non richiede un database locale scaricato:
+3bMeteo non richiede un database locale scaricato:
 la ricerca avviene live ad ogni richiesta tramite l'endpoint elastic search,
 che restituisce già id (loc_id) e id_settore (sec_id) necessari per le
 chiamate successive.
@@ -38,6 +38,10 @@ async def async_search_localita(hass: HomeAssistant, query: str) -> list[dict]:
         return []
 
     risultati = data.get("localita", []) if data else []
+
+    # Se c'è un solo risultato, l'API restituisce un oggetto invece di una lista
+    if isinstance(risultati, dict):
+        risultati = [risultati]
 
     results = []
     for r in risultati:

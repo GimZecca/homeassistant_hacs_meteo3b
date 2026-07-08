@@ -1,4 +1,5 @@
 {
   "name": "3bMeteo",
-  "category": "integration"
+  "category": "integration",
+  "render_readme": true
 }

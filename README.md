@@ -36,11 +36,17 @@ Integrazione non ufficiale per [3bMeteo](https://www.3bmeteo.com) che porta le p
 
 ## Installazione via HACS
 
+Clicca il pulsante per aggiungere automaticamente il repository:
+
+[![Open your Home Assistant instance and add this repository.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=GimZecca&repository=homeassistant_hacs_meteo3b&category=integration)
+
+Oppure manualmente:
+
 1. In HACS → **Integrations** → ⋮ → **Custom repositories**
 2. Aggiungi l'URL di questo repo, categoria **Integration**
 3. Cerca **3bMeteo** e clicca **Download**
 4. Riavvia Home Assistant
-
+   
 ## Installazione manuale
 
 1. Copia la cartella `custom_components/meteo3b/` in `config/custom_components/`

@@ -40,6 +40,8 @@ CONDITION_MAP: dict[str, str] = {
     "piogge":            "rainy",
     "piogge sparse":     "rainy",
     "possibili piogge":  "rainy",
+    "pioggia e schiarite": "rainy",
+    "rovesci e schiarite": "rainy",
     "rovesci":           "rainy",
     "rovesci sparsi":    "rainy",
     "temporale":         "lightning-rainy",

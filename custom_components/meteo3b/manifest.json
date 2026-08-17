@@ -1,7 +1,7 @@
 {
   "domain": "meteo3b",
   "name": "3bMeteo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "documentation": "https://github.com/GimZecca/homeassistant_hacs_meteo3b",
   "issue_tracker": "https://github.com/GimZecca/homeassistant_hacs_meteo3b/issues",
   "requirements": [],

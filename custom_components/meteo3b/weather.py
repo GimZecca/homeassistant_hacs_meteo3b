@@ -31,6 +31,7 @@ CONDITION_MAP: dict[str, str] = {
     "velature":          "partlycloudy",
     "velature sparse":   "partlycloudy",
     "velature estese":   "cloudy",
+    "nubi alte":         "partlycloudy",
     "molto nuvoloso":    "cloudy",
     "nuvoloso":          "cloudy",
     "coperto":           "cloudy",

@@ -30,13 +30,22 @@ def _giorni(data: dict) -> list[dict]:
     return (data or {}).get("previsione_giorno", [])
 
 
-def _oggi(data: dict) -> dict:
+def _giorno(data: dict, index: int) -> dict:
+    """Restituisce il blocco giorno all'indice indicato (0=oggi, 1=domani, ...)."""
     g = _giorni(data)
-    return g[0] if g else {}
+    return g[index] if len(g) > index else {}
 
 
-def _tempo_medio_oggi(data: dict) -> dict:
-    return _oggi(data).get("tempo_medio", {})
+def _oggi(data: dict) -> dict:
+    return _giorno(data, 0)
+
+
+def _domani(data: dict) -> dict:
+    return _giorno(data, 1)
+
+
+def _tempo_medio(giorno: dict) -> dict:
+    return giorno.get("tempo_medio", {})
 
 
 def _ora_corrente(data: dict) -> dict:
@@ -54,8 +63,8 @@ def _ora_corrente(data: dict) -> dict:
     return best
 
 
-def _effemeridi(data: dict) -> dict:
-    return _oggi(data).get("effemeridi", {})
+def _effemeridi(giorno: dict) -> dict:
+    return giorno.get("effemeridi", {})
 
 
 # ---------- sensor descriptions ----------
@@ -68,6 +77,7 @@ class Meteo3bSensorDescription(SensorEntityDescription):
 
 
 SENSORS: list[Meteo3bSensorDescription] = [
+    # ---- Condizioni attuali ----
     Meteo3bSensorDescription(
         key="temperatura",
         name="Temperatura",
@@ -115,25 +125,34 @@ SENSORS: list[Meteo3bSensorDescription] = [
         value_fn=lambda d: _ora_corrente(d).get("desc_breve"),
     ),
     Meteo3bSensorDescription(
+        key="uv",
+        name="Indice UV",
+        state_class=SensorStateClass.MEASUREMENT,
+        custom_icon="mdi:weather-sunny-alert",
+        value_fn=lambda d: _float(_ora_corrente(d).get("uv")),
+    ),
+
+    # ---- Riepilogo di oggi ----
+    Meteo3bSensorDescription(
         key="max_oggi",
         name="Temperatura Massima Oggi",
         device_class=SensorDeviceClass.TEMPERATURE,
         custom_unit=UnitOfTemperature.CELSIUS,
-        value_fn=lambda d: _float(_tempo_medio_oggi(d).get("t_max")),
+        value_fn=lambda d: _float(_tempo_medio(_oggi(d)).get("t_max")),
     ),
     Meteo3bSensorDescription(
         key="min_oggi",
         name="Temperatura Minima Oggi",
         device_class=SensorDeviceClass.TEMPERATURE,
         custom_unit=UnitOfTemperature.CELSIUS,
-        value_fn=lambda d: _float(_tempo_medio_oggi(d).get("t_min")),
+        value_fn=lambda d: _float(_tempo_medio(_oggi(d)).get("t_min")),
     ),
     Meteo3bSensorDescription(
-        key="uv",
-        name="Indice UV",
-        state_class=SensorStateClass.MEASUREMENT,
-        custom_icon="mdi:weather-sunny-alert",
-        value_fn=lambda d: _float(_ora_corrente(d).get("uv")),
+        key="precipitazioni_oggi",
+        name="Precipitazioni Oggi",
+        custom_icon="mdi:weather-rainy",
+        custom_unit="mm",
+        value_fn=lambda d: _float(_tempo_medio(_oggi(d)).get("precipitazioni")),
     ),
     Meteo3bSensorDescription(
         key="attendibilita",
@@ -145,20 +164,70 @@ SENSORS: list[Meteo3bSensorDescription] = [
         key="alba",
         name="Alba",
         custom_icon="mdi:weather-sunset-up",
-        value_fn=lambda d: _effemeridi(d).get("alba"),
+        value_fn=lambda d: _effemeridi(_oggi(d)).get("alba"),
     ),
     Meteo3bSensorDescription(
         key="tramonto",
         name="Tramonto",
         custom_icon="mdi:weather-sunset-down",
-        value_fn=lambda d: _effemeridi(d).get("tramonto"),
+        value_fn=lambda d: _effemeridi(_oggi(d)).get("tramonto"),
+    ),
+
+    # ---- Riepilogo di domani ----
+    Meteo3bSensorDescription(
+        key="condizione_domani",
+        name="Condizione Meteo Domani",
+        custom_icon="mdi:weather-partly-cloudy",
+        value_fn=lambda d: _tempo_medio(_domani(d)).get("desc_breve"),
     ),
     Meteo3bSensorDescription(
-        key="precipitazioni_oggi",
-        name="Precipitazioni Oggi",
+        key="max_domani",
+        name="Temperatura Massima Domani",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        custom_unit=UnitOfTemperature.CELSIUS,
+        value_fn=lambda d: _float(_tempo_medio(_domani(d)).get("t_max")),
+    ),
+    Meteo3bSensorDescription(
+        key="min_domani",
+        name="Temperatura Minima Domani",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        custom_unit=UnitOfTemperature.CELSIUS,
+        value_fn=lambda d: _float(_tempo_medio(_domani(d)).get("t_min")),
+    ),
+    Meteo3bSensorDescription(
+        key="precipitazioni_domani",
+        name="Precipitazioni Domani",
         custom_icon="mdi:weather-rainy",
         custom_unit="mm",
-        value_fn=lambda d: _float(_tempo_medio_oggi(d).get("precipitazioni")),
+        value_fn=lambda d: _float(_tempo_medio(_domani(d)).get("precipitazioni")),
+    ),
+    Meteo3bSensorDescription(
+        key="probabilita_pioggia_domani",
+        name="Probabilità Pioggia Domani",
+        state_class=SensorStateClass.MEASUREMENT,
+        custom_unit=PERCENTAGE,
+        custom_icon="mdi:weather-pouring",
+        value_fn=lambda d: _float(_tempo_medio(_domani(d)).get("probabilita_prec")),
+    ),
+    Meteo3bSensorDescription(
+        key="vento_domani",
+        name="Velocità Vento Domani",
+        device_class=SensorDeviceClass.WIND_SPEED,
+        state_class=SensorStateClass.MEASUREMENT,
+        custom_unit=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        value_fn=lambda d: _float(_tempo_medio(_domani(d)).get("vento", {}).get("intensita")),
+    ),
+    Meteo3bSensorDescription(
+        key="alba_domani",
+        name="Alba Domani",
+        custom_icon="mdi:weather-sunset-up",
+        value_fn=lambda d: _effemeridi(_domani(d)).get("alba"),
+    ),
+    Meteo3bSensorDescription(
+        key="tramonto_domani",
+        name="Tramonto Domani",
+        custom_icon="mdi:weather-sunset-down",
+        value_fn=lambda d: _effemeridi(_domani(d)).get("tramonto"),
     ),
 ]
 
